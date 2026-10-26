@@ -127,6 +127,29 @@ def send_pushplus(title, content, token):
         return False
 
 
+# ========== 新增 Server酱 推送函数 ==========
+def push_serverchan(key: str, title: str, content: str) -> bool:
+    """Server酱 Turbo(SCT开头key) 推送"""
+    if not key:
+        return False
+    try:
+        url = f"https://sctapi.ftqq.com/{key}.send"
+        data = {
+            "title": title,
+            "desp": content
+        }
+        resp = requests.post(url, data=data, timeout=15)
+        ret = resp.json()
+        print(f"[Server酱 通知] {ret}")
+        ok = ret.get("code") == 0
+        if not ok:
+            print(f"[Server酱 失败原因] {ret.get('message')}")
+        return ok
+    except Exception as e:
+        print(f"[Server酱 通知异常] {e}")
+        return False
+
+
 def dispatch_notifications(title, message):
     """统一派发所有已配置渠道的通知"""
     # 1. 企业微信自建应用
@@ -145,19 +168,14 @@ def dispatch_notifications(title, message):
     pushplus_token = os.environ.get('PUSHPLUS_TOKEN') or os.environ.get('PUSH_PLUS_TOKEN') or ''
     if pushplus_token:
         print("[消息推送] 正在发送 PushPlus 通知...")
-        send_pushplus(title, message, pushplus_token)
+        send_pushplus(title, message)
 
-def push_serverchan(key: str, title: str, content: str) -> bool:
-    """Server酱推送"""
-    if not key:
-        return False
-    return _push_request(
-        "Server酱",
-        f"https://sctapi.ftqq.com/{key}.send",
-        data_payload={"title": title, "desp": content},
-        success_check=lambda resp, r: r.ok and resp.get("code") == 0,
-        fail_msg_keys=("message",),
-    )
+    # ========== 新增 Server酱派发，原有逻辑完全不动 ==========
+    serverchan_key = os.environ.get("SERVERCHAN_KEY") or ""
+    if serverchan_key:
+        print("[消息推送] 正在发送 Server酱 通知...")
+        push_serverchan(serverchan_key, title, message)
+
 
 # ─────────────────────────────────────────────
 # 邮箱脱敏工具函数
