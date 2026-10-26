@@ -35,6 +35,7 @@ jobs:
           ACCOUNTS: ${{ secrets.ACCOUNTS }}
           IKUUU_DOMAIN: ${{ secrets.IKUUU_DOMAIN }}
           # 企业微信单变量合并配置（推荐）
+          SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
           WECHAT_WORK: ${{ secrets.WECHAT_WORK }}
           WX_CONFIG: ${{ secrets.WX_CONFIG }}
           # 企业微信旧独立变量（兼容回退）
