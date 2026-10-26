@@ -147,6 +147,17 @@ def dispatch_notifications(title, message):
         print("[消息推送] 正在发送 PushPlus 通知...")
         send_pushplus(title, message, pushplus_token)
 
+def push_serverchan(key: str, title: str, content: str) -> bool:
+    """Server酱推送"""
+    if not key:
+        return False
+    return _push_request(
+        "Server酱",
+        f"https://sctapi.ftqq.com/{key}.send",
+        data_payload={"title": title, "desp": content},
+        success_check=lambda resp, r: r.ok and resp.get("code") == 0,
+        fail_msg_keys=("message",),
+    )
 
 # ─────────────────────────────────────────────
 # 邮箱脱敏工具函数
